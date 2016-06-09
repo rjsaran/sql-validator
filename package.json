@@ -1,0 +1,35 @@
+{
+  "name": "sql-validator",
+  "version": "1.0.0",
+  "description": "SQL Data Validator",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ram-jeet/sql-validator.git"
+  },
+  "keywords": [
+    "sql",
+    "validator",
+    "mysql",
+    "validation",
+    "database",
+    "validate",
+    "sanity",
+    "sanitizer"
+  ],
+  "author": "Ramjeet Saran",
+  "license": "MIT",
+  "dependencies": {
+    "validator": "^5.4.0"
+  },
+  "devDependencies": {
+    "mocha": "latest"
+  },
+  "bugs": {
+    "url": "https://github.com/ram-jeet/sql-validator/issues"
+  },
+  "homepage": "https://github.com/ram-jeet/sql-validator#readme"
+}
