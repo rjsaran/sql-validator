@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/ram-jeet/sql-validator.git"
+    "url": "git+ssh://git@github.com/rjsaran/sql-validator.git"
   },
   "keywords": [
     "sql",
