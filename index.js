@@ -19,7 +19,6 @@ class SqlValidator {
   constructor(options) {
     options = options || {};
 
-    this.version       = '1.0.0';
     this.mandatoryMap  = options.mandatoryMap  || {};
     this.validationMap = options.validationMap || {};
   }

@@ -25,9 +25,6 @@
   "dependencies": {
     "validator": "^5.4.0"
   },
-  "devDependencies": {
-    "mocha": "latest"
-  },
   "bugs": {
     "url": "https://github.com/ram-jeet/sql-validator/issues"
   },
