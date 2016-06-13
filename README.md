@@ -2,11 +2,13 @@
 
 A simple and light validator for Javascript Objects.
 
+Install the library with `npm install sql-validator`
+
 Supports 4 type of validations:
 
 ### Validations
 
-- **dataType** - (Supports all validations of [Validator](https://www.npmjs.com/package/validator) )
+- **dataType** - (Supports most of [Validator](https://www.npmjs.com/package/validator) )
                 - **isNumeric, isAlpha, isAlphanumeric, isBase84, isAscii, isBoolean, isDecimal, isEmail, isIp, isInt, isJson, isNull, isMongoid, isUrl etc.** -
 - **isOneOf** - checks if input is one of actual value
 
@@ -19,9 +21,35 @@ And along with these 4 validations one can add own custom validations. See below
 Example Code:
 
 ```javascript
-var Validator = require('sql-validator');
+var Validator = require('./');
 
-var validationMap = {
+// create & update are mode
+var mandatoryMap = {
+  create: ['id', 'string1', 'status', 'date', 'value'],
+  update: ['id']
+};
+
+var addressValidator = new Validator(mandatoryMap);
+
+// data to be validated
+var address = {
+  id: 17282,
+  country: 'INDIA',
+  status: 1,
+  created_at: new Date()
+}
+
+
+// there are two way to create validation map
+// 1)
+var validationMap1 = {
+  date     : addressValidator.check('should be a valid date').dataType('isDate'),
+  age      : addressValidator.check().dataType('isNumeric').custom(even),
+  string1  : addressValidator.check('length should be between 3 & 30').dataType('isAlphanumeric').lengthBetween({'min': 3, 'max': 30})
+};
+
+// 2)
+var validationMap2 = {
   id: {
     dataType: 'isNumeric'
   },
@@ -41,47 +69,29 @@ var validationMap = {
   }
 };
 
-// mandotory map check if given parameters is present or not in input 
-// according to type of operation
-var options = {
-  validationMap: validationMap,
-  mandatoryMap: {
-    create: ['id', 'address', 'status'],
-    update: ['id']
-  }
-};
 
-var address = {
-  id: 17282,
-  country: 'INDIA',
-  status: 1,
-  created_at: new Date()
-}
-
-var addressValidator = new Validator(options);
-
-var result = addressValidator.isValid(address, 'update');
+var result1 = addressValidator.isValid(address, validationMap1, 'update');
+var result2 = addressValidator.isValid(address, validationMap2, 'update');
 ```
 
 
-if address is a valid address than result will be {valid: true}
-else result will be like  {valid: false, error: 'Validation Failed'}
+if address is a valid address than result => {valid: true}
+else result => {valid: false, error: 'Validation Failure.', invalid_key: 'key' }
 
 Add Custom Validation Code:
 
 ```javascript
-var lessThan = function (actual, target) {
-  return actual < target;
+var even = function() {
+  return function(actual) {
+    return actual % 2 === 0 ? true : false;
+  };
 };
 
-lessThan.errorMessage = '${key} should be less than ${targetValue}';
-
-var lessThanValidator = {
-  lessThan: lessThan
+var evenValidator = {
+  even: even
 };
 
-addressValidator.addValidations(lessThanValidator);
-
+addressValidator.addValidations(evenValidator);
 ```
 
 

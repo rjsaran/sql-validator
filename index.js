@@ -10,42 +10,37 @@ Object.defineProperty(exports, "__esModule", {
 var util = require('util');
 
 //----------- LOCAL MODULES ----------//
-var sqlValidator  = require('./sqlValidator');
+var standardValidations = require('./validation');
+var chain               = require('./chain');
 
 // Validator Base Class
-class SqlValidator {
+class Validator {
 
   // constructor
-  constructor(options) {
-    options = options || {};
-
-    this.mandatoryMap  = options.mandatoryMap  || {};
-    this.validationMap = options.validationMap || {};
+  constructor(mandatoryMap) {
+    this.validations         = {};
+    this.mandatoryMap        = mandatoryMap || {};
+    this.DEFAULT_FAILURE_MSG = 'Validation Failure.';
+    this.addValidations(standardValidations);
   }
 
   // main function which check if data is valid or not
   // response
   // if valid     => {valid: true}
-  // if not valid => {valid: false, error: 'validation failed'}
-  isValid(data, mode) {
-    var validationMap = this.validationMap,
-        mandatoryMap  = this.mandatoryMap,
+  // if not valid => {valid: false, error: 'Validation Failure.', failure_key: 'key'}
+  isValid(data, validationMap, mode) {
+    var mandatoryMap  = this.mandatoryMap,
         missing       = [],
         response      = {};
 
-    if (!mode) {
-      response.valid = false;
-      response.error = 'operation mode missing';
-      return response;
-    }
-    if (!mandatoryMap[mode]) {
-      response.valid = false;
-      response.error = 'invalid mode for mandatory map';
-      return response;
+    // If no mode Specified or mode is not present in mandotory map
+    // we are not throwing any error just validating the data
+    if (!mode || !mandatoryMap[mode]) {
+      return this.validate(data, validationMap);
     }
 
     mandatoryMap[mode].forEach(param => {
-      if (data[param] === undefined) {
+      if (data[param] === undefined || data[param] === null) {
         missing.push(param);
       }
       if (data[param] && typeof data[param] === 'string' && !data[param].trim()) {
@@ -60,15 +55,70 @@ class SqlValidator {
       return response;
     }
 
-    return sqlValidator.validate(data, validationMap);
+    return this.validate(data, validationMap);
   }
 
-  // handler function to add custom validations 
+  // handler to add custom validations
   addValidations(customValidations) {
-    sqlValidator.addValidations(customValidations);
+    for (var key in customValidations) {
+      if (customValidations.hasOwnProperty(key)) {
+        this.validations[key] = customValidations[key];
+      }
+    }
+  }
+
+  // Core validate function
+  validate(data, validationMap) {
+    validationMap = validationMap || {};
+
+    var isValid   = true,
+        response    = {
+          valid: true
+        };
+
+    for (var key in data) {
+      var actualValue = data[key],
+          rules = validationMap[key];
+
+      if (rules) {
+        if(rules instanceof chain) {
+          for (var i in rules.validations) {
+            isValid = isValid && rules.validations[i](actualValue);
+
+            if (!isValid) {
+              response.valid         = false;
+              response.error         = rules.errMsg || this.DEFAULT_FAILURE_MSG;
+              response.invalid_key   = key;
+              return response;
+            }
+          }
+        }
+        else {
+          for (var rule in rules) {
+            if (this.validations[rule]) {
+              var targetValue = rules[rule];
+
+              isValid = isValid && this.validations[rule](targetValue)(actualValue);
+
+              if (!isValid) {
+                response.valid         = false;
+                response.error         = this.DEFAULT_FAILURE_MSG;
+                response.invalid_key   = key;
+                return response;
+              }
+            }
+          }
+        }
+      }
+    }
+    return response;
+  }
+
+  check(errMsg) {
+    return new chain(errMsg);
   }
 }
 
-exports.default = SqlValidator;
+exports.default = Validator;
 
 module.exports = exports['default'];

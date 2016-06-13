@@ -4,9 +4,48 @@
 
 var Validator = require('./');
 
-var validationMap = {
+var mandatoryMap = {
+  create: ['id', 'string1', 'status', 'date', 'value'],
+  update: ['id']
+};
+var customValidator = new Validator(mandatoryMap);
+
+// custom validator 1
+var isArray = function () {
+  return function (actual) {
+    return Array.isArray(actual);
+  };
+};
+
+// custom validator 2
+var even = function() {
+  return function(actual) {
+    return actual % 2 === 0 ? true : false;
+  };
+};
+
+var data = {
+  id: 102,
+  string1: 'teststring',
+  status: 1,
+  date: '122',
+  value: 300,
+  age: 56
+};
+
+// Example 1:
+
+var newValidations = {
+  isArray : isArray,
+  even    : even
+};
+
+customValidator.addValidations(newValidations);
+
+var validationMap1 = {
   id: {
-    dataType: 'isNumeric'
+    dataType : 'isNumeric',
+    even     : null
   },
   string1: {
     'dataType':  'isAlphanumeric',
@@ -18,9 +57,6 @@ var validationMap = {
   status: {
     'isOneOf': [0, 1]
   },
-  date: {
-    'dataType': 'isDate'
-  },
   value: {
     valueBetween: {
       min: 100,
@@ -29,33 +65,22 @@ var validationMap = {
   }
 };
 
-var options = {
-  validationMap: validationMap,
-  mandatoryMap: {
-    create: ['id', 'string1', 'status', 'date', 'value'],
-    update: ['id']
-  }
+// output: { valid: true }
+console.log(customValidator.isValid(data, validationMap1, 'create'));
+
+
+// Example 2:
+
+
+var validationMap2 = {
+  age      : customValidator.check().dataType('isNumeric').custom(even),
+  date     : customValidator.check('should be a valid date').dataType('isDate'),
+  string1  : customValidator.check().dataType('isAlphanumeric').lengthBetween({'min': 3, 'max': 30})
 };
 
-var customValidator = new Validator(options);
+data.string1 = 'a';
+// output: { valid: false, error: 'Validation Failure.', invalid_key: 'string1' }
+console.log(customValidator.isValid(data, validationMap2, 'update'));
 
-var lessThan = function (actual, target) {
-  return actual < target;
-};
-lessThan.errorMessage = '${key} should be less than ${targetValue}';
 
-var newValidations = {
-  lessThan: lessThan
-};
 
-customValidator.addValidations(newValidations);
-
-var data = {
-  id: 102,
-  string1: 'teststring',
-  status: 1,
-  date: '122',
-  value: 300
-};
-
-console.log(customValidator.isValid(data, 'create'));

@@ -11,13 +11,12 @@ exports.default = isOneOf;
 //----------- THIRD PARTY MODULES ----//
 var validator     = require('validator');
 
-function isOneOf() {
-  var actual = arguments[0] + '',
-      target = arguments[1];
+function isOneOf(target) {
+  return function () {
+    var actual = arguments[0] + '';
 
-  return validator.isIn(actual, target);
+    return validator.isIn(actual, target);
+  };
 }
 
 module.exports  = exports['default'];
-
-module.exports.errorMessage = '${key} should be One Of ${targetValue}';
