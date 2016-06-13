@@ -1,6 +1,6 @@
 {
   "name": "sql-validator",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "SQL Data Validator",
   "main": "index.js",
   "scripts": {
