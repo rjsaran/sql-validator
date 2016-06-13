@@ -18,7 +18,7 @@ Supports 4 type of validations:
 
 And along with these 4 validations one can add own custom validations. See below for Example Code.
 
-Example Code:
+### Example Code:
 
 ```javascript
 var Validator = require('./');
@@ -74,11 +74,17 @@ var result1 = addressValidator.isValid(address, validationMap1, 'update');
 var result2 = addressValidator.isValid(address, validationMap2, 'update');
 ```
 
+### Output
+if valid
+```javascript
+{ valid: true }
+```
+if invalid
+```javascript
+{ valid: false, error: 'Validation Failure.', invalid_key: 'key' }
+```
 
-if address is a valid address than result => {valid: true}
-else result => {valid: false, error: 'Validation Failure.', invalid_key: 'key' }
-
-Add Custom Validation Code:
+### Add Custom Validation Code:
 
 ```javascript
 var even = function() {
