@@ -8,7 +8,7 @@ Supports 4 type of validations:
 
 ### Validations
 
-- **dataType** - (Supports most of [Validator](https://www.npmjs.com/package/validator) )
+- **dataType** - (Supports most of Validation of chriso's [Validator](https://www.npmjs.com/package/validator) )
                 - **isNumeric, isAlpha, isAlphanumeric, isBase84, isAscii, isBoolean, isDecimal, isEmail, isIp, isInt, isJson, isNull, isMongoid, isUrl etc.** -
 - **isOneOf** - checks if input is one of actual value
 
